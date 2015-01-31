@@ -32,7 +32,7 @@ class Board(object):
     """Constructor: initializes an instance of class Board.  Size
          is used to set the game board to be an NxN matrix.
        Precondition: size is an int >= 0."""
-    assert(isinstance(size), int and size >= 0), "size is not an int > 0"
+    assert(isinstance(size, int) and size >= 0), "size is not an int > 0"
     self.matrix= np.zeros((size, size), dtype=np.int)
     print self.matrix
 
@@ -50,4 +50,4 @@ class Board(object):
 ############################  Script Code  ################################
 
 if __name__ == "__main__":
-  Board()
+  Board(4)
