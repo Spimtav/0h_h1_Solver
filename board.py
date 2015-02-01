@@ -69,11 +69,63 @@ class Board(object):
          color is EMPTY, RED, or BLUE."""
     self.validSquare(square)
     self.matrix[square]= color
+ 
+  ##############Functions to determine validity of square placement 
+
+  #Rule 1: equal # of color pieces in each row/col
+  def equalColorLine(self, lst):
+    """Returns: True if there are an equal number of red and blue pieces in
+         the list; False otherwise.
+       Precondtion: lst is a 1d list of ints representing a row or col."""
+    colors= {RED: 0, BLUE: 0, EMPTY: 0}
+    for i in lst:
+      colors[i]+= 1
+    return colors[RED] == colors[BLUE]
   
+  def equalColorBoard(self):
+    """Returns: True if there are an equal number of red and blue pieces in
+         each row and column in the board; False otherwise."""
+    equal= True
+    for i in range(self.size):
+      l= [self.equalColorLine(self.getRow(i)), self.equalColorLine(self.getCol(i))]
+      if False in l:
+        equal= False
+        break
+    return equal
+
+  #Rule 2: no three colors in a row in each row/col
+  def noThreesLine(self, lst):
+    """Returns: True if the current row/col contains no 3 adjacent squares
+         of the same color; False otherwise.
+       Precondition: lst is a 1d list of ints representing a row or col."""
+    valid= True
+    for i in range(len(lst) - 2):
+      if lst[i] == lst[i+1] and lst[i] == lst[i+2]:
+        valid= False
+        break
+    return valid
+
+  def noThreesBoard(self):
+    """Returns: True if there are no adjacent three color squares in the
+         entire board; False otherwise."""
+    valid= True
+    for i in range(self.size):
+      l= [self.noThreesLine(self.getRow(i)), self.noThreesLine(self.getCol(i))]
+      if False in l:
+        valid= False
+        break
+    return valid
+
+  #Rule 3: no two rows/cols are the same
   
+  #DO UNIQUE COL AND UNIQ ROW SEPARATE, COMBINE IN BOARD FUNC
 
 
-
+  def uniqueBoard(self):
+    """Returns: True if no two rows or cols are equal in the whole board;
+         False otherwise."""
+    return 
+ 
 
 
 
@@ -83,9 +135,11 @@ class Board(object):
 
 if __name__ == "__main__":
   b= Board(4)
-  #b.matrix[0]= [0.0, 0.1, 0.2, 0.3]
-  #b.matrix[1]= [1.0, 1.1, 1.2, 1.3]
-  #b.matrix[2]= [2.0, 2.1, 2.2, 2.3]
-  #b.matrix[3]= [3.0, 3.1, 3.2, 3.3]
-  b.fillSquare((2, 1), BLUE)
+  b.matrix[0]= [1,1,2,2]
+  b.matrix[1]= [1,1,2,2]
+  b.matrix[2]= [2,2,1,1]
+  b.matrix[3]= [2,2,1,1]
+
   print b.matrix
+  print b.equalColorBoard()
+  print b.noThreesBoard()
