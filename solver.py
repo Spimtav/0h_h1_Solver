@@ -3,6 +3,8 @@
 #February 2, 2015
 """Template class for all solvers."""
 
+import board
+
 class Solver(object):
   """Class solver represents a template class for a solver of a game of
        0h_hi.  Contains stubs for methods needed by all solvers.
