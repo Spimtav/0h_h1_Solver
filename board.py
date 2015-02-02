@@ -29,9 +29,12 @@ class Board(object):
             
      Data Members:
        size: an int >= 4 to represent the NxN size of the board
-       matrix: an NxN numpy array, representing the 2d game board.  Values 
+       matrix: an NxN 2d numpy array, representing the 2d game board. Values 
                are ints and can be <EMPTY> for empty, <RED> for red, 
-               and <BLUE> for blue."""
+               and <BLUE> for blue.
+       mutable: an NxN 2d numpy array, representing the mutability of each
+               square on the board.  Values are bools, and can be True for
+               mutability and False for immutability."""
 
   def __init__(self, size):
     """Constructor: initializes an instance of class Board.  Size
@@ -40,6 +43,13 @@ class Board(object):
     assert(isinstance(size, int) and size >= 4), "size is not an int > 4"
     self.size= size
     self.matrix= np.zeros((size, size), dtype=np.int)
+    mutable= []
+    for i in range(self.size):
+      row= []
+      for j in range(self.size):
+        row.append(True)
+      mutable.append(row)
+    self.mutable= mutable
 
   def validSquare(self, square):
     """Raises AssertionError if square is not a valid tuple of ints of 
@@ -120,11 +130,34 @@ class Board(object):
   
   #DO UNIQUE COL AND UNIQ ROW SEPARATE, COMBINE IN BOARD FUNC
 
+  def uniqueRows(self):
+    """Returns: True if all rows in the board are unique; False otherwise."""
+    matrix= self.matrix.tolist()  #Need to do in order to check membership
+    unique= True
+    for i in range(self.size):
+      if matrix[i] in matrix[i+1:]:
+        unique= False
+        break
+    return unique
+
+  def uniqueCols(self):
+    """Returns: True if all cols in the board are unique; False otherwise."""
+    #Flip matrix for easy comparison
+    colmat= []
+    for i in range(self.size):
+      colmat.append(self.getCol(i))
+    #Do the uniq comparison
+    unique= True
+    for i in range(self.size):
+      if colmat[i] in colmat[i+1:]:
+        unique= False
+        break
+    return unique
 
   def uniqueBoard(self):
     """Returns: True if no two rows or cols are equal in the whole board;
          False otherwise."""
-    return 
+    return self.uniqueRows() and self.uniqueCols()
  
 
 
@@ -135,11 +168,12 @@ class Board(object):
 
 if __name__ == "__main__":
   b= Board(4)
-  b.matrix[0]= [1,1,2,2]
-  b.matrix[1]= [1,1,2,2]
-  b.matrix[2]= [2,2,1,1]
-  b.matrix[3]= [2,2,1,1]
+  b.matrix[0]= [2,2,1,1]
+  b.matrix[1]= [1,2,1,2]
+  b.matrix[2]= [2,1,2,1]
+  b.matrix[3]= [1,1,2,2]
 
   print b.matrix
   print b.equalColorBoard()
   print b.noThreesBoard()
+  print b.uniqueBoard()
