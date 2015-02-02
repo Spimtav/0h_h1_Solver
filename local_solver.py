@@ -5,5 +5,20 @@
 
 import solver, board
 
-class LocalSolver(solver):
- 
+class LocalSolver(solver.Solver):
+  """Class to solve a game of 0h_h1 using local search strategies."""
+  
+  def __init__(self, board):
+    """Initialize the solver using parent class method."""
+    super(LocalSolver, self).__init__(board) 
+
+
+
+
+
+
+  def solver(self):
+    pass
+
+  def printSolution(self):
+    pass

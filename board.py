@@ -160,10 +160,6 @@ class Board(object):
     return self.uniqueRows() and self.uniqueCols()
  
 
-
-
-
-
 ############################  Script Code  ################################
 
 if __name__ == "__main__":
