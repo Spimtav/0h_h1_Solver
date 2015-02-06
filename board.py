@@ -72,6 +72,25 @@ class Board(object):
     for row in self.matrix:
       col.append(row[col_num])
     return col
+
+  def getColMatrix(self):
+    """Returns: 2d int list corresponding to the column matrix of
+         <self.matrix> (rows and cols switched)."""
+    col_mat= []
+    for i in range(self.size):
+      col_mat.append(self.getCol(i))
+    return col_mat
+
+  def getAllLines(self):
+    """Returns: 2d int list corresponding to all rows and columns
+         of the matrix represented by <self.matrix>, mostly to
+         make iteration easy."""
+    lines= []
+    for row in self.matrix:
+      lines.append(row)
+    for col in self.getColMatrix():
+      lines.append(col)
+    return lines
   
   def fillSquare(self, square, color):
     """Sets the specified square to have <color>'s color.
@@ -143,13 +162,13 @@ class Board(object):
   def uniqueCols(self):
     """Returns: True if all cols in the board are unique; False otherwise."""
     #Flip matrix for easy comparison
-    colmat= []
+    col_mat= []
     for i in range(self.size):
-      colmat.append(self.getCol(i))
+      col_mat.append(self.getCol(i))
     #Do the uniq comparison
     unique= True
     for i in range(self.size):
-      if colmat[i] in colmat[i+1:]:
+      if col_mat[i] in col_mat[i+1:]:
         unique= False
         break
     return unique
@@ -159,17 +178,82 @@ class Board(object):
          False otherwise."""
     return self.uniqueRows() and self.uniqueCols()
  
+  ################### Useful functions for local search scoring
+  
+  #three main funcs, one per rule - totalnum threes, totalnum unequal, totalnum identicals
+  #then unite into main scoring func. then the rest should be easy!
+
+  def numUnequal(self):
+    """Returns: the total number of rows and columns that have an unequal
+         number of red and blue pieces, as an int."""
+    unequal= 0
+    lines= self.getAllLines()    
+    #Row and col color equality counts
+    for line in lines:
+      d= {RED: 0, BLUE: 0}
+      for square_color in line:
+        d[square_color]+= 1
+      if d[RED] != d[BLUE]:
+        unequal+= 1
+    return unequal
+
+  def numThrees(self):
+    """Returns: the total number of three-in-a-row pieces on the entire
+         board, as an int."""
+    threes= 0
+    lines= self.getAllLines()
+    #Row and col threes counts
+    for line in lines:
+      for i in range(self.size - 2):
+        if line[i] == line[i+1] and line[i] == line[i+2]:
+          threes+= 1
+    return threes 
+
+  def numDups(self):
+    """Returns: the total number of duplicate columns and rows in
+         <self.matrix>, as an int. For any multiset of duplicates, this 
+         method treats one as being normal and the other len(multiset)-1
+         as duplicates.  Ex: numDuplicate([1,1,2]) = 1 if this method
+         worked on single lists."""
+    dups= 0
+    #Num unique rows
+    matrix= self.matrix.tolist()
+    colmat= self.getColMatrix()
+    for i in range(self.size):
+      if matrix[i] in matrix[i+1:]:
+        dups+= 1
+        matrix
+      if colmat[i] in colmat[i+1:]:
+        dups+= 1
+    return dups
+
+  def score(self):
+    """Returns: int representing the sum of the three individual score
+         values: <numUnequal> + <numThrees> + <numDups>. Boards closer
+         to the solution have lower values, so score is essentially
+         a measure of the number of mistakes in the matrix."""
+    return self.numUnequal() + self.numThrees() + self.numDups()
+
+  def printScore(self):
+    """Prints the individual score values and total score in an 
+         easy-to-read format."""
+    print "Number unequal color lines: " + str(self.numUnequal())
+    print "Number threes: " + str(self.numThrees())
+    print "Number duplicate lines: " + str(self.numDups())
+    print "Total score: " + str(self.score())
+    
 
 ############################  Script Code  ################################
 
 if __name__ == "__main__":
   b= Board(4)
-  b.matrix[0]= [2,2,1,1]
+  b.matrix[0]= [2,2,1,2]
   b.matrix[1]= [1,2,1,2]
-  b.matrix[2]= [2,1,2,1]
-  b.matrix[3]= [1,1,2,2]
+  b.matrix[2]= [1,1,2,2]
+  b.matrix[3]= [2,1,2,1]
 
   print b.matrix
-  print b.equalColorBoard()
-  print b.noThreesBoard()
-  print b.uniqueBoard()
+  #print b.equalColorBoard()
+  #print b.noThreesBoard()
+  #print b.uniqueBoard()
+  b.printScore()
