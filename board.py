@@ -39,6 +39,7 @@ class Board(object):
   def __init__(self, size):
     """Constructor: initializes an instance of class Board.  Size
          is used to set the game board to be an NxN matrix.
+       NOTE: asks user for input to set the initial, immutable square colors.
        Precondition: size is an int >= 4."""
     assert(isinstance(size, int) and size >= 4), "size is not an int > 4"
     self.size= size
@@ -50,6 +51,70 @@ class Board(object):
         row.append(True)
       mutable.append(row)
     self.mutable= mutable
+    self.initialSquares()
+    
+  def parseInput(self, s):
+    """Returns: all individual pieces of s that are separated by /, in
+         correct types, as a list if input is formatted correctly.
+         Otherwise, will recurse on self.initialSquares.
+       Precondition: s is a string.
+       Ex: parseInput("4/2/red") -> [4, 2, RED]."""
+    if s == "q":
+      return s
+    l= []
+    #Extract first datum, the x-coord, and add to list.
+    if "/" not in s:
+      print "Invalid format."
+      self.initialSquares()
+    x_coord= s[:s.index("/")]
+    if not x_coord.isdigit():
+      print "Invalid X-coordinate."
+      self.initialSquares()
+    x_coord= int(x_coord)
+    if x_coord < 0 or x_coord >= self.size:
+      print "X-coordinate out of board size range."
+      self.initialSquares()
+    l.append(x_coord)
+    s= s[s.index("/") + 1:]
+    #Extract second datum, the y-coord, and add to list.
+    if "/" not in s:
+      print "Invalid format."
+      self.initialSquares()
+    y_coord= s[:s.index("/")]
+    if not y_coord.isdigit():
+      print "Invalid Y-coordinate."
+      self.initialSquares()
+    y_coord= int(y_coord)
+    if y_coord < 0 or y_coord >= self.size:
+      print "Y-coordinate out of board size range."
+      self.initialSquares()
+    l.append(y_coord)
+    s= s[s.index("/") + 1:]
+    #Extract third datum, the color, and add to list.
+    if s == "red":
+      l.append(RED)
+    elif s == "blue":
+      l.append(BLUE)
+    else:
+      print "Invalid color. Please choose 'red' or 'blue'"
+      self.initialSquares()
+    #Everything worked, so return l.
+    return l
+
+  def initialSquares(self):
+    """Asks user for the starting square locations and colors, and then
+         makes those changes to <self.matrix> and <self.mutable>."""
+    print ""
+    print "Pick your board's initial square locations and colors."
+    print "Please enter the x-coord, y-coord, and color, separating each with a single '/'."
+    print "Note: (0, 0) is top-left corner."
+    x= ""
+    while x != "q":
+      x= raw_input("X-coord/Y-coord/Color (either 'red' or 'blue'), or 'q' to quit: ").lower().strip()
+      if x != "q":
+        data= self.parseInput(x) #If passed, data is all correct and in list form
+        self.matrix[data[0]][data[1]]= data[2]
+        self.mutable[data[0]][data[1]]= False
 
   def validSquare(self, square):
     """Raises AssertionError if square is not a valid tuple of ints of 
@@ -98,6 +163,14 @@ class Board(object):
          color is EMPTY, RED, or BLUE."""
     self.validSquare(square)
     self.matrix[square]= color
+
+  def switchColor(self, square):
+    """Sets the specified square to have the opposite color.
+       Precondition: <square> is a tuple of ints of 0 <= i < size."""
+    if self.matrix[square] == RED:
+      self.matrix[square]= BLUE
+    elif self.matrix[square] == BLUE:
+      self.matrix[square]= RED
  
   ##############Functions to determine validity of square placement 
 
@@ -177,6 +250,10 @@ class Board(object):
     """Returns: True if no two rows or cols are equal in the whole board;
          False otherwise."""
     return self.uniqueRows() and self.uniqueCols()
+
+  def isSolved(self):
+    """Returns: True if this board is solved; False otherwise."""
+    return self.equalColorBoard() and self.noThreesBoard() and self.uniqueBoard()
  
   ################### Useful functions for local search scoring
   

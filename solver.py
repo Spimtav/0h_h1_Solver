@@ -11,10 +11,13 @@ class Solver(object):
      Data Members:
        board: an instance of class <Board>."""
 
-  def __init__(self, board):
+  def __init__(self, board, algo):
     """Constructor: initializes an instance of class Solver.
-       Precondition: board is a valid instance of class Board."""
+       Precondition: board is a valid instance of class Board,
+         algo is a string representing a valid solving algorithm."""
     self.board= board
+    self.algo= algo
+    self.iterations= 0
   
   def solve(self):
     """Solves the board in self.board and updates its self.matrix."""
